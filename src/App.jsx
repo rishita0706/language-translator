@@ -1,6 +1,7 @@
 import {useState} from 'react';
 import bgImage from "./assets/bg.jpeg";
 import { Copy } from "lucide-react";
+import {Check} from "lucide-react";
 
 function App(){
   const [text, setText] = useState("");
@@ -9,32 +10,33 @@ function App(){
   const [loading, setLoading] = useState(false);
   const [outputMessage, setOutputMessage] = useState("");
   const [displayText, setDisplayText] = useState("");
+  const [copied, setCopied] = useState(false);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(translated);
     setCopied(true);
-    setTimeout(() => setCopied(false), 1500);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   const translateText = async () => {
+    setOutputMessage("");
     if (!language) {
       setOutputMessage(" Please select a language");
+      return;
+    }
+    if(!text.trim()) {
+      setOutputMessage("Enter some text to translate");
       return;
     }
   try {
     setLoading(true);
 
     const response = await fetch(
-      `https://api.mymemory.translated.net/get?q=${text}&langpair=en|${language}`
+      `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=en|${language}`
     );
 
     const data = await response.json();
 
-    console.log(data);
-
-    setTranslated(
-      data.responseData.translatedText
-    );
     const result = data.responseData.translatedText;
 
     setTranslated(result);
@@ -52,6 +54,7 @@ function App(){
 
   } catch (error) {
     console.error("Error:", error);
+    setOutputMessage("Something went wrong. Try again.");
     setLoading(false);
   }
 };
@@ -81,6 +84,7 @@ function App(){
     <div className="w-full md:w-[50%] bg-[#E3D1C3] flex items-center justify-center px-4 md:px-6 py-8 relative overflow-hidden">
 
       {/* FLOATING BACKGROUND BLOBS */}
+      
       <div className="absolute w-72 h-72 bg-[#C8A19C]/30 rounded-full blur-3xl top-10 left-10 animate-pulse"></div>
       <div className="absolute w-72 h-72 bg-[#976D61]/20 rounded-full blur-3xl bottom-10 right-10 animate-pulse"></div>
 
@@ -90,17 +94,20 @@ function App(){
         <h1 className="text-3xl md:text-4xl font-bold text-center text-[#976D61]">
           Language Translator
         </h1>
+        {outputMessage && <p className="text-red-500 text-center font-bold">{outputMessage}</p>}
 
         {/* INPUT */}
-        <div className="relative group">
+        
+        <div className="relative mt-0">
+          <label className="text-sm text-[#976D61]">
+            Enter text
+          </label>
           <textarea
-            className="w-full p-4 pt-6 rounded-xl bg-white/40 backdrop-blur-lg border border-white/50 text-[#3a2e2a] focus:outline-none transition duration-300 group-hover:shadow-xl group-hover:scale-[1.02]"
+            className="w-full p-4 rounded-xl bg-white/40 backdrop-blur-lg border border-white/50 text-[#3a2e2a] focus:outline-none transition duration-300 group-hover:shadow-xl group-hover:scale-[1.02]"
             value={text}
             onChange={(e) => setText(e.target.value)}
           />
-          <label className="absolute left-4 top-1 text-sm text-[#976D61]">
-            Enter text
-          </label>
+          
         </div>
 
         {/* DROPDOWN */}
@@ -135,7 +142,7 @@ function App(){
               onClick={handleCopy}
               className="absolute bottom-3 right-3 text-[#976D61] hover:scale-110 transition"
             >
-              <Copy size={18} />
+              {copied ? <Check size={18} /> : <Copy size={18} />}
             </button>
           )}
 
