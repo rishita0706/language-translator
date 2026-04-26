@@ -1,6 +1,7 @@
 import {useState} from 'react';
 import bgImage from "./assets/bg.jpeg";
 import { Copy } from "lucide-react";
+import {Check} from "lucide-react";
 
 function App(){
   const [text, setText] = useState("");
@@ -9,9 +10,12 @@ function App(){
   const [loading, setLoading] = useState(false);
   const [outputMessage, setOutputMessage] = useState("");
   const [displayText, setDisplayText] = useState("");
+  const [copied, setCopied] = useState(false);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(translated);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   const translateText = async () => {
@@ -50,6 +54,7 @@ function App(){
 
   } catch (error) {
     console.error("Error:", error);
+    setOutputMessage("Something went wrong. Try again.");
     setLoading(false);
   }
 };
@@ -137,7 +142,7 @@ function App(){
               onClick={handleCopy}
               className="absolute bottom-3 right-3 text-[#976D61] hover:scale-110 transition"
             >
-              <Copy size={18} />
+              {copied ? <Check size={18} /> : <Copy size={18} />}
             </button>
           )}
 
