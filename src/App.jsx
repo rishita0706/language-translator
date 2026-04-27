@@ -19,6 +19,7 @@ function App(){
   };
 
   const translateText = async () => {
+    if(loading) return;
     setOutputMessage("");
     if (!language) {
       setOutputMessage(" Please select a language");
