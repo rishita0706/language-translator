@@ -27,10 +27,15 @@ function App() {
     })
   };
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText(translated);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(translated);
+      setCopied(true);
+
+      setTimeout(() => setCopied(false), 1500);
+    } catch (err) {
+      console.error("Copy failed:", err);
+    }
   };
 
   const translateText = async () => {
